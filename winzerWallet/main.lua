@@ -22,7 +22,8 @@ local pWall = Player:GetWallet();
 local maxWall = pWall:GetSize();
 
 local function updateMainWindowContent()
-    local wishedItems = { "Herbstfest-Medaille", "Zerfledderter Schatten" };
+    local wishedItems = { "Herbstfest-Medaille", "Zerfledderter Schatten" }; -- hier die gewünschten Wallet-Item eintragen,
+    -- noch ist die Anzeige auf 2 optimiert
     local text = {};
 
     for i = 1, #wishedItems do
@@ -31,6 +32,7 @@ local function updateMainWindowContent()
 
         for j = 1, maxWall do  
             local currentItem = pWall:GetItem(j);
+            -- Um das Wallet in den Chat zu loggen, die nächste Zeile entkommentieren
             -- Turbine.Shell.WriteLine(tostring(currentItem:GetName()));
             local currentItemName = tostring(currentItem:GetName());
             local currentItemQuantity = tostring(currentItem:GetQuantity());
