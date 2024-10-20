@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <Plugin>
     <Information>
-        <Name>WinzerOne</Name>
+        <Name>winzerWallet</Name>
         <Author>epicWinzer</Author>
         <Version>0.1.0</Version>
         <Description>
             Beeing informed about a strong need for hero-mark-tracking, finally the epicWinzer is here, testing plugin-business for your pleassure. 
         </Description>
     </Information>
-    <Package>WinzerPlugins.WinzerOne.Main</Package>
-    <Configuration Apartment="WinzerOne"></Configuration>
+    <Package>WinzerPlugins.winzerWallet.Main</Package>
+    <Configuration Apartment="winzerWallet"></Configuration>
 </Plugin>
