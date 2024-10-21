@@ -21,10 +21,12 @@ local Player = Turbine.Gameplay.LocalPlayer.GetInstance();
 local pWall = Player:GetWallet();
 local maxWall = pWall:GetSize();
 
+local foundItems = {};
+
 local function updateMainWindowContent()
-    local wishedItems = { "Herbstfest-Medaille", "Zerfledderter Schatten" }; -- hier die gewünschten Wallet-Item eintragen,
-    -- noch ist die Anzeige auf 2 optimiert
+    local wishedItems = { "Herbstfest-Medaille", "Zerfledderter Schatten" }; -- gewünschte Wallet-Items TODO: Dynamisiert ausbauen
     local text = {};
+    foundItems = {};  -- Setze foundItems zurück, um neu zu sammeln
 
     for i = 1, #wishedItems do
         local currentWishedItem = wishedItems[i];
@@ -32,14 +34,17 @@ local function updateMainWindowContent()
 
         for j = 1, maxWall do  
             local currentItem = pWall:GetItem(j);
-            -- Um das Wallet in den Chat zu loggen, die nächste Zeile entkommentieren
+            -- Um das Wallet inden Chat zu loggen, die nächste Zeile entkommentieren
             -- Turbine.Shell.WriteLine(tostring(currentItem:GetName()));
             local currentItemName = tostring(currentItem:GetName());
             local currentItemQuantity = tostring(currentItem:GetQuantity());
 
-           if currentItemName == currentWishedItem then
+            if currentItemName == currentWishedItem then
                 text[i] = currentItemName .. ": " .. currentItemQuantity;
                 found = true;
+
+                -- Füge gefundene Items zu foundItems hinzu
+                table.insert(foundItems, currentItem);
                 break;
             end
         end
@@ -49,17 +54,42 @@ local function updateMainWindowContent()
         end
     end
 
-    -- Update the label with all the found items
+    -- Update das Label mit allen gefundenen Items
     targetLabel:SetText( table.concat(text, "\n") );
 end
 
+-- Dynamische Eventhandler für Quantity-Änderungen registrieren
+local function registerQuantityChangedHandlers()
+    for _, item in ipairs(foundItems) do
+        -- Entferne zuerst alte Handler, um doppelte Registrierungen zu vermeiden
+        item.QuantityChanged = nil;
+
+        item.QuantityChanged = function(sender, args)
+            Turbine.Shell.WriteLine("Menge von " .. sender:GetName() .. " wurde geändert.");
+            updateMainWindowContent();  -- Status aktualisieren
+        end
+    end
+end
+
+-- Initiale Anzeige und Registrierung der Event-Handler
 updateMainWindowContent();
-pWall.ItemAdded = function( sender, args )
+registerQuantityChangedHandlers();
+
+-- Event-Handler für hinzugefügte Items im Wallet
+pWall.ItemAdded = function(sender, args)
+    Turbine.Shell.WriteLine("Item hinzugefügt.");
     updateMainWindowContent();
+    registerQuantityChangedHandlers();  -- Event-Handler erneut registrieren
 end
-pWall.ItemRemoved = function( sender, args )
+
+-- Event-Handler für entfernte Items im Wallet
+pWall.ItemRemoved = function(sender, args)
+    Turbine.Shell.WriteLine("Item entfernt.");
     updateMainWindowContent();
+    registerQuantityChangedHandlers();  -- Event-Handler erneut registrieren
 end
-targetLabel.MouseDoubleClick = function( sender, args )
-    mainWindow:SetVisible( false );
+
+-- Doppelklick auf das Label versteckt das Fenster
+targetLabel.MouseDoubleClick = function(sender, args)
+    mainWindow:SetVisible(false);
 end
