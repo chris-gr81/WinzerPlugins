@@ -34,7 +34,7 @@ local function updateMainWindowContent()
 
         for j = 1, maxWall do  
             local currentItem = pWall:GetItem(j);
-            -- Um das Wallet inden Chat zu loggen, die nächste Zeile entkommentieren
+            -- Um das Wallet in den Chat zu loggen, die nächste Zeile entkommentieren
             -- Turbine.Shell.WriteLine(tostring(currentItem:GetName()));
             local currentItemName = tostring(currentItem:GetName());
             local currentItemQuantity = tostring(currentItem:GetQuantity());
@@ -77,14 +77,12 @@ registerQuantityChangedHandlers();
 
 -- Event-Handler für hinzugefügte Items im Wallet
 pWall.ItemAdded = function(sender, args)
-    Turbine.Shell.WriteLine("Item hinzugefügt.");
     updateMainWindowContent();
     registerQuantityChangedHandlers();  -- Event-Handler erneut registrieren
 end
 
 -- Event-Handler für entfernte Items im Wallet
 pWall.ItemRemoved = function(sender, args)
-    Turbine.Shell.WriteLine("Item entfernt.");
     updateMainWindowContent();
     registerQuantityChangedHandlers();  -- Event-Handler erneut registrieren
 end
