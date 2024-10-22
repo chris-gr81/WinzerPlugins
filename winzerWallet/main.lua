@@ -19,9 +19,29 @@ targetLabel:SetSize( 300, 50 );
 
 local Player = Turbine.Gameplay.LocalPlayer.GetInstance();
 local pWall = Player:GetWallet();
-local maxWall = pWall:GetSize();
+local walletSize = pWall:GetSize();
+
+local checkInterval = 2;
+local timeSinceLastCheck = 0;
 
 local foundItems = {};
+
+-- Funktion, die beim Ändern der Wallet-Größe ausgeführt wird
+local function onWalletSizeChanged(newSize)
+    Turbine.Shell.WriteLine("Handler für SizeChange feuert")
+    updateMainWindowContent();
+    registerQuantityChangedHandlers();
+end
+
+-- Funktion zur Überwachung der Wallet-Größe
+local function monitorWalletSize()
+    local currentSize = pWall:GetSize();
+
+    if currentSize ~= walletSize then
+        onWalletSizeChanged(currentSize);
+        walletSize = currentSize; -- Aktualisiere den letzten bekannten Zustand
+    end
+end
 
 local function updateMainWindowContent()
     local wishedItems = { "Herbstfest-Medaille", "Zerfledderter Schatten" }; -- gewünschte Wallet-Items TODO: Dynamisiert ausbauen
@@ -32,7 +52,7 @@ local function updateMainWindowContent()
         local currentWishedItem = wishedItems[i];
         local found = false;
 
-        for j = 1, maxWall do  
+        for j = 1, walletSize do  
             local currentItem = pWall:GetItem(j);
             -- Um das Wallet in den Chat zu loggen, die nächste Zeile entkommentieren
             -- Turbine.Shell.WriteLine(tostring(currentItem:GetName()));
@@ -75,6 +95,10 @@ end
 updateMainWindowContent();
 registerQuantityChangedHandlers();
 
+
+-- TODO: Event-Handler auf SetSize
+
+
 -- Event-Handler für hinzugefügte Items im Wallet
 pWall.ItemAdded = function(sender, args)
     updateMainWindowContent();
@@ -90,4 +114,21 @@ end
 -- Doppelklick auf das Label versteckt das Fenster
 targetLabel.MouseDoubleClick = function(sender, args)
     mainWindow:SetVisible(false);
+end
+
+-- Timer für die regelmäßige Überprüfung
+local sizeMonitorTimer = Turbine.UI.Control();
+sizeMonitorTimer:SetWantsUpdates(true);
+
+-- Update-Funktion des Timers
+sizeMonitorTimer.Update = function(sender, args)
+    -- Sicherstellen, dass args.ElapsedTime existiert und nicht nil ist
+    if args and args.ElapsedTime then
+        timeSinceLastCheck = timeSinceLastCheck + args.ElapsedTime; -- Zeit seit dem letzten Aufruf
+
+        if timeSinceLastCheck >= checkInterval then
+            monitorWalletSize();
+            timeSinceLastCheck = 0; -- Reset der Zeit
+        end
+    end
 end
