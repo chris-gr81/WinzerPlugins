@@ -8,6 +8,7 @@ function TextLabel:Constructor(sizeY, sizeX, posY, posX, parent)
     self:SetParent( parent )
     self:SetSize ( sizeY, sizeX)
     self:SetPosition (posY, posX)
+    self:SetMouseVisible(false)
 end
 
 _G.TextLabel = TextLabel
