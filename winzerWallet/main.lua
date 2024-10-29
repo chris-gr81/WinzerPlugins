@@ -4,12 +4,11 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 import "Turbine.Gameplay";
 
-AppDir = "WinzerPlugins.winzerWallet";
-AppDirD = AppDir..".";
+AppDir = "WinzerPlugins.winzerWallet.";
 
 -- Importiere die Module und stelle sie global zur Verfügung
-import (AppDirD.."Interface")
-import (AppDirD.."Wallet")
+import (AppDir.."Interface")
+import (AppDir.."Wallet")
 
 Wallet.wishedItems = { "Herbstfest-Medaille", "Arnorische Bronzemünze" }
 

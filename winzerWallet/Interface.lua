@@ -1,16 +1,12 @@
 -- Interface.lua
+
+-- Klassenimporte
+classDir = "WinzerPlugins.winzerWallet.classes.";
+import (classDir.."PanelButton")
+import (classDir.."BasicWindow")
+import (classDir.."TextLabel")
+
 Interface = {}
-
-local PanelButton = require
--- Erzeugt einheitliches Fenster-Design
-Interface.setStandardDesign = function(designElement)
-    local mainBackClr = Turbine.UI.Color(0, 0, 0)
-    designElement:SetVisible(true)
-    designElement:SetBackColor(mainBackClr)
-    designElement:SetOpacity(0.6)
-end
-
-local innerPadding = 10
 
 local function viewHide() 
     if (Interface.mainWindow:IsVisible()) then
@@ -20,31 +16,20 @@ local function viewHide()
     end
 end
 
-Interface.mainWindow = Turbine.UI.Window()
-Interface.setStandardDesign(Interface.mainWindow)
-Interface.mainWindow:SetSize(300, 40)
-Interface.mainWindow:SetPosition(900, 30)
+Interface.mainWindow = BasicWindow(300, 40, 900, 30, true)
+Interface.mainLabel = TextLabel(300, 50, 10, 10, Interface.mainWindow)
 
-Interface.targetLabel = Turbine.UI.Label()
-Interface.targetLabel:SetParent(Interface.mainWindow)
-Interface.targetLabel:SetPosition(innerPadding, innerPadding)
-Interface.targetLabel:SetSize(300, 50)
 
 -- Funktion, um das Label-Textfeld zu aktualisieren
 function Interface.updateLabelText(text)
-    Turbine.Shell.WriteLine("updateLabelText springt an")
-    Interface.targetLabel:SetText(table.concat(text, "\n"))
+    Interface.mainLabel:SetText(table.concat(text, "\n"))
 end
 
-Interface.presentMenu = Turbine.UI.Window()
-Interface.setStandardDesign(Interface.presentMenu)
-Interface.presentMenu:SetSize(50, 100);
-Interface.presentMenu:SetPosition(00, 300)
+Interface.sideBar = BasicWindow(50, 100, 0, 300, true)
 
-Interface.mainSwitchButton = PanelButton()
-Interface.mainSwitchButton:SetParent(Interface.presentMenu)
-Interface.mainSwitchButton:SetVisible(true)
-Interface.mainSwitchButton:SetPosition (5, 5)
+
+-- SidebarButton zum switchen der Bar
+Interface.mainSwitchButton = PanelButton(5, 5, true, Interface.sideBar)
 Interface.mainSwitchButton:SetText(viewHide())
 
 Interface.mainSwitchButton.Click = function( sender, args )
