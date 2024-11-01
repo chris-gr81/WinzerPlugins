@@ -7,14 +7,12 @@ import "Turbine.Gameplay";
 
 AppDir = "WinzerPlugins.winzerWallet.";
 
--- Importiere die Module und stelle sie global zur Verfügung
 import (AppDir.."Interface")
 import (AppDir.."Wallet")
 import (AppDir.."Menu")
+import (AppDir.."discOperations")
 
-Wallet.wishedItems = Menu:GetWishedItems()
-
--- Funktion zur Aktualisierung wishedItems und Layout des Interface
+-- Funktion zur Aktualisierung von wishedItems und Interface
 function UpdateWishedItemsAndRefresh()
     Wallet.wishedItems = Menu:GetWishedItems()
     Interface.updateLabelText(Wallet.updateMainWindowContent())
@@ -25,9 +23,11 @@ function UpdateWishedItemsAndRefresh()
     Interface.UpdateMainWindowLayout(Wallet.wishedItems)
 end
 
--- Initialisiere das Interface und aktualisiere den Inhalt
+-- Lädt und synchronisiert die wishedItems beim Start und aktualisiert das Interface
+Menu:LoadWishedItemsAndSync()
 UpdateWishedItemsAndRefresh()
 
+-- Event für hinzugefügte Items
 Wallet.pWall.ItemAdded = function(sender, args)
     local text = Wallet.updateMainWindowContent()
     Interface.updateLabelText(text)
@@ -37,6 +37,7 @@ Wallet.pWall.ItemAdded = function(sender, args)
     end)
 end
 
+-- Event für entfernte Items
 Wallet.pWall.ItemRemoved = function(sender, args)
     local removedItemName = tostring(args.Item:GetName())
     local text = Wallet.updateMainWindowContent(removedItemName)

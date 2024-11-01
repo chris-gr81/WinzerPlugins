@@ -1,9 +1,26 @@
--- Menu.lua
+import (AppDir.."discOperations")
 
 Menu = {}
 Menu.itemList = {}
 
--- Stelle sicher, dass Wallet und pWall definiert ist und pWall Elemente enthält
+-- Funktion zum Design für ausgewählte Checkbox
+function Menu:SetTrueCheckboxDesign(button)
+    button:SetBackColor(Turbine.UI.Color(0.6, 0.6, 0.6))
+    button:SetOpacity(0.6)
+end
+
+-- Funktion zum Design für nicht ausgewählte Checkbox
+function Menu:SetFalseCheckboxDesign(button)
+    button:SetBackColor(Turbine.UI.Color(0.2, 0.2, 0.2))
+    button:SetOpacity(0.6)
+end
+
+-- Funktion zum Speichern der gewünschten Items-Status über discOperations
+function Menu:SaveWishedItems()
+    DiscOperations.SaveWishedItems(self.itemList)
+end
+
+-- Initialisiere itemList basierend auf Wallet-Daten
 local walletSize = Wallet.pWall:GetSize()
 Turbine.Shell.WriteLine(walletSize .. " Items gefunden")
 
@@ -18,26 +35,29 @@ for i = 1, walletSize do
     end
 end
 
--- Design für die ausgewählte Checkbox
-function Menu:SetTrueCheckboxDesign(button)
-    button:SetBackColor(Turbine.UI.Color(0.6, 0.6, 0.6))
-    button:SetOpacity(0.6)
+-- Lädt die gespeicherten wishedItems und gleicht sie ab
+function Menu:LoadWishedItemsAndSync()
+    DiscOperations.LoadWishedItems(function(savedItems)
+        -- Setze den isSelected-Status auf Basis der gespeicherten Items
+        for _, item in ipairs(self.itemList) do
+            item.isSelected = false  -- Standardmäßig auf false setzen
+            for _, savedItem in ipairs(savedItems) do
+                if item.name == savedItem then
+                    item.isSelected = true
+                    break
+                end
+            end
+        end
+    end)
 end
 
--- Design für die nicht ausgewählte Checkbox
-function Menu:SetFalseCheckboxDesign(button)
-    button:SetBackColor(Turbine.UI.Color(0.2, 0.2, 0.2))
-    button:SetOpacity(0.6)
-end
-
--- Funktion zum Erstellen der Checkbox-Buttons und Labels und dynamische Anpassung der Fensterhöhe
+-- Funktion zum Erstellen der Checkbox-Buttons und Labels
 function Menu:CreateCheckBoxButtons(parent)
     local elements = {}
     local yPosition = 5
-    local itemHeight = 20  -- Höhe für jedes Item (Checkbox + Label)
+    local itemHeight = 20
 
     for _, item in ipairs(self.itemList) do
-        -- Erstelle einen Button als Checkbox 
         local checkboxButton = PanelButton(5, yPosition, true, parent) 
         checkboxButton:SetSize(10, 10)
 
@@ -48,7 +68,7 @@ function Menu:CreateCheckBoxButtons(parent)
             self:SetFalseCheckboxDesign(checkboxButton)
         end
 
-        -- Eventhandler zum Umschalten von isSelected
+        -- Eventhandler zum Umschalten von isSelected und Speichern der Daten
         checkboxButton.Click = function(sender, args)
             item.isSelected = not item.isSelected
             if item.isSelected then
@@ -57,8 +77,9 @@ function Menu:CreateCheckBoxButtons(parent)
                 self:SetFalseCheckboxDesign(sender) 
             end
 
-            -- Rufe die Aktualisierungsfunktion in Main.lua auf 
-            UpdateWishedItemsAndRefresh()
+            -- Speichern und direktes Aktualisieren des mainWindows
+            self:SaveWishedItems()
+            UpdateWishedItemsAndRefresh()  -- Aktualisiere das Interface
         end
 
         -- Erstelle ein Label für den Item-Text
@@ -67,21 +88,19 @@ function Menu:CreateCheckBoxButtons(parent)
         itemLabel:SetSize(500, 15)
         itemLabel:SetText(item.name .. " (" .. item.quantity ..")")
 
-        -- Element zur Liste hinzufügen
         table.insert(elements, checkboxButton)
         table.insert(elements, itemLabel)
 
-        yPosition = yPosition + itemHeight  -- Abstand für das nächste Item
+        yPosition = yPosition + itemHeight
     end
 
-    -- Passe die Höhe des Elternfensters an die Anzahl der Items an
-    local totalHeight = #self.itemList * itemHeight + 10  -- 10 Pixel Puffer oben und unten
+    local totalHeight = #self.itemList * itemHeight + 10
     parent:SetHeight(totalHeight)
 
     return elements
 end
 
--- Funtkion, um alle ausgewählten Items zurückzugeben
+-- Funktion, um alle ausgewählten Items zurückzugeben
 function Menu:GetWishedItems()
     local wishedItems = {}
     for _, item in ipairs(self.itemList) do
