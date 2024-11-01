@@ -3,9 +3,14 @@
     <Information>
         <Name>winzerWallet</Name>
         <Author>epicWinzer</Author>
-        <Version>0.1.0</Version>
+        <Version>1.0.0</Version>
         <Description>
-            Beeing informed about a strong need for hero-mark-tracking, finally the epicWinzer is here, testing plugin-business for your pleassure. 
+            winzerWallet is a lightweight, transparently designed plugin that dynamically reads the wallet and lets the user choose which wallet items they want to track permanently. 
+            The wallet tracker can be switched on and off via the sidebar and there is a menu for configuring the tracker with the corresponding items from the wallet. 
+            winzerWallet saves the selection for each character individually. The plugin is completely dynamic, there is no need to wait for updates when new items come into play.
+            This is my first plugin for Lotro, have fun with it.
+         
+            epicWinzer (for contact: Istandiel on Mordor)
         </Description>
     </Information>
     <Package>WinzerPlugins.winzerWallet.Main</Package>
